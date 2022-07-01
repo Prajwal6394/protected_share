@@ -1,15 +1,31 @@
-const multer = require("multer")
-const express  = require("express")
-const app  = express();
+const multer = require("multer");
+const express = require("express");
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const File = require("./models/File");
+require("dotenv").config();
+const app = express();
 
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ dest: "uploads" });
 
-app.set("view engine", "ejs"); 
-app.get("/",(req,res)=>{
-    res.render("index")
-})
+mongoose.connect(process.env.DATABASE_URL);
+app.set("view engine", "ejs");
+app.get("/", (req, res) => {
+  res.render("index");
+});
 
-app.post("/upload", upload.single("file"), (req, res) => {
-    res.send("hi");
-})
-app.listen(3000)
+app.post("/upload", upload.single("file"), async (req, res) => {
+  const fileData = {
+    path: req.file.path,
+    orignalName: req.file.originalname,
+  };
+
+  if (req.body.password != null && req.body.password !== "") {
+    fileData.password = await bcrypt.hash(req.body.password, 10);
+  }
+
+  const file = await File.create(fileData);
+  console.log(file);
+  res.send(file.originalName)
+});
+app.listen(process.env.PORT);

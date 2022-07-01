@@ -1,10 +1,12 @@
-const multer = require("multer");
-const express = require("express");
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
-const File = require("./models/File");
-require("dotenv").config();
+const multer = require("multer")
+const express = require("express")
+const mongoose = require("mongoose")
+const bcrypt = require("bcrypt")
+require("dotenv").config()
+const File = require("./models/File")
+
 const app = express();
+
 
 const upload = multer({ dest: "uploads" });
 
@@ -17,7 +19,7 @@ app.get("/", (req, res) => {
 app.post("/upload", upload.single("file"), async (req, res) => {
   const fileData = {
     path: req.file.path,
-    orignalName: req.file.originalname,
+    orignalName: req.file.originalname
   };
 
   if (req.body.password != null && req.body.password !== "") {
@@ -26,6 +28,6 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 
   const file = await File.create(fileData);
   console.log(file);
-  res.send(file.originalName)
+  res.send(file.originalName);
 });
 app.listen(process.env.PORT);
